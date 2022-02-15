@@ -60,6 +60,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         permissionToRequest = permissionToRequest(permissions);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (permissionToRequest.size() > 0) {
+                requestPermissions(permissionToRequest
+                        .toArray(new String[permissionToRequest
+                                .size()]), ALL_PERMISSION_RESULT);
+            }
+        }
+
         client = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .addOnConnectionFailedListener(this)
@@ -116,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         Toast.makeText(this, "No Services", Toast.LENGTH_SHORT).show();
                         finish();
                     });
+            assert errorDialog != null;
             errorDialog.show();
         } else {
             Toast.makeText(this, "No Services", Toast.LENGTH_SHORT).show();
@@ -125,6 +134,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
+        if (location != null){
+            locationTextView.setText(String.format("Lat:%s Lon: %s", location.getLatitude(), location.getLongitude()));
+        }
 
     }
 
@@ -140,8 +152,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onSuccess(Location location) {
                 if (location != null) {
-                    locationTextView.setText("Lat:" + location.getLatitude() +
-                            " Lon: " + location.getLongitude());
+                    locationTextView.setText(String.format("Lat:%s Lon: %s", location.getLatitude(), location.getLongitude()));
                 }
             }
         });
